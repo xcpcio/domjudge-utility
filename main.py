@@ -4,10 +4,13 @@ import base64
 import os
 import json
 import logging
-import requests
 import shutil
 import math
 import yaml
+import time
+
+import grequests
+import requests
 
 
 def objectToJSONString(obj):
@@ -93,9 +96,15 @@ class Config:
         # Since Ghost Dat Data with Chinese team names may be garbled
         # when imported into Codeforces,
         # We found that if some dummy Russian teams are added, it may works.
-        # This configuration item is only for exporting ghost dat data
+        # This configuration field is only for exporting ghost dat data
         self.add_dummy_russian_team = self.getConfigWithDefaultCalue(
             config_dict, 'add_dummy_russian_team', False)
+
+        # Since there are too many requests to send when downloading sourcecode,
+        # we use `grequests` to send in parallel,
+        # this configuration field can set the number of parallel sending
+        self.grequests_parallels_nums = self.getConfigWithDefaultCalue(
+            config_dict, 'grequests_parallels_nums', 100)
 
         self.exported_data = Config.ExportedData(
             config_dict['exported_data'] if 'exported_data' in config_dict.keys() else {})
@@ -260,26 +269,43 @@ def dumpRuns():
                   sub_dir_path, saved_filename))
 
 
-def downloadSourceCodeFiles(sid):
-    url = urlJoin(base_url, str(default_config.cid),
-                  'submissions', str(sid), 'files')
-    res = sendRequest(url)
+def downloadSourceCode(submission_id_list):
+    err_list = []
 
-    with open(os.path.join(submissions_dir, str(sid), 'files.zip'), 'wb') as f:
-        f.write(res.content)
+    def exception_handler(request, exception):
+        logger.error('An error occurred during request GET {}, exception:{}'.format(
+            request.url, exception))
 
+        err_list.append(request)
 
-def downloadSourceCodeJson(sid):
-    url = urlJoin(base_url, str(default_config.cid),
-                  'submissions', str(sid), 'source-code')
-    res = sendRequest(url)
+    reqs = []
 
-    content = res.content.decode('unicode-escape')
+    for submission_id in submission_id_list:
+        url_prefix = urlJoin(base_url, str(default_config.cid),
+                             'submissions', str(submission_id))
+        reqs.append(grequests.get(url=urlJoin(
+            url_prefix, 'files'), headers=headers))
+        reqs.append(grequests.get(url=urlJoin(
+            url_prefix, 'source-code'), headers=headers))
 
-    with open(os.path.join(submissions_dir, str(sid), 'source-code.json'), 'w') as f:
-        f.write(content)
+    res_list = grequests.map(reqs, exception_handler=exception_handler)
 
-    return content
+    if len(err_list) > 0:
+        return False
+
+    for i in range(0, len(res_list), 2):
+        submission_id = submission_id_list[i // 2]
+
+        res_files = res_list[i]
+        res_source_code = res_list[i + 1]
+
+        with open(os.path.join(submissions_dir, str(submission_id), 'files.zip'), 'wb') as f:
+            f.write(res_files.content)
+
+        with open(os.path.join(submissions_dir, str(submission_id), 'source-code.json'), 'w') as f:
+            f.write(res_source_code.content.decode('unicode-escape'))
+
+    return True
 
 
 def dumpSourceCode():
@@ -292,16 +318,22 @@ def dumpSourceCode():
 
         ensureDir(submissions_dir)
 
+        submission_id_list = []
+
         for submission in submissions:
             submission_id = submission['id']
+            submission_id_list.append(submission_id)
 
             ensureDir(os.path.join(submissions_dir, submission_id))
 
-            downloadSourceCodeFiles(submission_id)
-            downloadSourceCodeJson(submission_id)
-
             i = i + 1
-            if i % 50 == 0 or i == total:
+            if i % 100 == 0 or i == total:
+                while not downloadSourceCode(submission_id_list):
+                    time.sleep(1)
+                    logger.info("retrying")
+
+                submission_id_list.clear()
+
                 logger.info('Submissions {}/{}'.format(str(i), str(total)))
 
 
@@ -472,7 +504,7 @@ def main():
     global headers, base_url, sub_dir_path, submissions_dir
 
     headers = {'Authorization': 'Basic ' +
-               base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip()}
+               base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close'}
 
     base_url = urlJoin(default_config.base_url, 'api',
                        default_config.api_version, 'contests')
