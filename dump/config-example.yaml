@@ -1,0 +1,7 @@
+base_url: "https://example.com/domjudge/"
+userpwd: "admin:password"
+cid: 1
+add_dummy_russian_team: true
+exported_data:
+    runs: true
+    source_code: true
