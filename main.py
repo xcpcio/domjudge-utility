@@ -15,8 +15,8 @@ def objectToJSONString(obj):
     return json.dumps(obj, sort_keys=False, separators=(',', ':'), ensure_ascii=False)
 
 
-def outputToFile(filename, data, if_not_exists=False):
-    dir_name = os.path.join(default_config.saved_dir, filename)
+def outputToFile(filepath, data, if_not_exists=False):
+    dir_name = os.path.join(default_config.saved_dir, filepath)
 
     if if_not_exists and os.path.exists(dir_name):
         return
@@ -97,7 +97,7 @@ def initLogging():
     logger.addHandler(consoleHandler)
 
 
-def requestJson(endpoint):
+def requestJson(endpoint, params={}):
     if default_config.base_file_path == '':
         url = urlJoin(base_url, str(default_config.cid))
 
@@ -105,7 +105,8 @@ def requestJson(endpoint):
             url = urlJoin(url, endpoint)
 
         logger.info('GET {}'.format(url))
-        res = requests.get(url=url, headers=headers)
+        res = requests.get(url=url, params=params,
+                           headers=headers)
         logger.info('Result Code: {}'.format(res.status_code))
 
         if res.status_code != 200:
@@ -120,13 +121,38 @@ def requestJson(endpoint):
             return f.read()
 
 
-def requestJsonAndSave(endpoint, filename):
+def requestJsonAndSave(endpoint, filename, params={}):
+    sub_dir_path = 'domjudge-api'
     content = requestJson(
-        endpoint if default_config.base_file_path == '' else filename)
+        endpoint if default_config.base_file_path == '' else filename, params=params)
 
-    outputToFile(filename, content)
+    if default_config.save_domjudge_api_to_file:
+        ensureDir(os.path.join(default_config.saved_dir, sub_dir_path))
+        outputToFile(os.path.join(sub_dir_path, filename), content)
 
-    return json.loads(content)
+    try:
+        return json.loads(content)
+    except Exception as err:
+        logger.error(err)
+        return content
+
+
+def addVerdict(submissions, judgements):
+    submissions_verdict = {}
+    for judgement in judgements:
+        id = judgement['submission_id']
+        verdict = judgement['judgement_type_id']
+
+        submissions_verdict[id] = verdict
+
+    for submission in submissions:
+        id = submission['id']
+
+        # Pending
+        if id not in submissions_verdict.keys():
+            submission['verdict'] = 'PD'
+        else:
+            submission['verdict'] = submissions_verdict[id]
 
 
 def getSeconds(t):
@@ -284,25 +310,7 @@ def getDATData(contest, teams_dict, submissions, problems_dict):
     outputToFile('contest.dat', dat_data)
 
 
-def addVerdict(submissions, judgements):
-    submissions_verdict = {}
-    for judgement in judgements:
-        id = judgement['submission_id']
-        verdict = judgement['judgement_type_id']
-
-        submissions_verdict[id] = verdict
-
-    for submission in submissions:
-        id = submission['id']
-
-        # Pending
-        if id not in submissions_verdict.keys():
-            submission['verdict'] = 'PD'
-        else:
-            submission['verdict'] = submissions_verdict[id]
-
-
-def export():
+def main():
     global headers, base_url, submissions_dir
     global contest, awards, scoreboard, groups, judgements
     global judgement_types, languages, organizations, problems, teams, submissions
@@ -327,9 +335,10 @@ def export():
     contest = requestJsonAndSave('', 'contest.json')
     awards = requestJsonAndSave('awards', 'awards.json')
     scoreboard = requestJsonAndSave('scoreboard', 'scoreboard.json')
-    # clarifications = requestJsonAndSave(
-    #     'clarifications', 'clarifications.json')
-    # event_feed =  requestJsonAndSave('event-feed', 'event-feed.json')
+    clarifications = requestJsonAndSave(
+        'clarifications', 'clarifications.json')
+    # event_feed = requestJsonAndSave(
+    #     'event-feed', 'event-feed.json', {'stream': False, 'strict': True})
     groups = requestJsonAndSave('groups', 'groups.json')
     judgements = requestJsonAndSave('judgements', 'judgements.json')
     judgement_types = requestJsonAndSave(
@@ -360,4 +369,4 @@ def export():
 
 
 if __name__ == '__main__':
-    export()
+    main()
