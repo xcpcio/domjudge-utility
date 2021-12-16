@@ -97,16 +97,9 @@ class Config:
         self.score_in_seconds = self.getConfigWithDefaultCalue(
             config_dict, 'score_in_seconds', False)
 
-        # Since Ghost Dat Data with Chinese team names may be garbled
-        # when imported into Codeforces,
-        # We found that if some dummy Russian teams are added, it may works.
-        # This configuration field is only for exporting ghost dat data
         self.add_dummy_russian_team = self.getConfigWithDefaultCalue(
             config_dict, 'add_dummy_russian_team', False)
 
-        # Since there are too many requests to send when downloading sourcecode,
-        # we use `grequests` to send in parallel,
-        # this configuration field can set the number of parallel sending
         self.grequests_parallels_nums = self.getConfigWithDefaultCalue(
             config_dict, 'grequests_parallels_nums', 100)
 
