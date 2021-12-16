@@ -3,4 +3,5 @@ userpwd: "admin:password"
 cid: 1
 
 # Number of rounds submitted
+# defaults to `1`
 total: 10
