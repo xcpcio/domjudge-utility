@@ -1,0 +1,4 @@
+base_url: "https://example.com/domjudge/"
+userpwd: "admin:password"
+cid: 1
+total: 10
