@@ -8,6 +8,7 @@ import shutil
 import math
 import yaml
 import time
+import glob
 
 import grequests
 import requests
@@ -249,10 +250,24 @@ def dumpDOMjudgeAPI():
 
 
 def dumpRuns():
-    if default_config.base_url == '':
+    if not default_config.exported_data.runs:
         return
 
-    if default_config.exported_data.runs:
+    if default_config.base_file_path != '':
+        for filepath in glob.glob('{}/runs.*.json'.format(default_config.base_file_path)):
+            filename = os.path.split(filepath)[-1]
+
+            src = os.path.join(default_config.base_file_path, filename)
+            dst = os.path.join(
+                default_config.saved_dir, sub_dir_path, filename)
+
+            logger.info("%s,%s" % (src, dst))
+
+            shutil.copyfile(src, dst)
+
+        return
+
+    if default_config.base_url != '':
         runs = requestJsonAndSave('runs?limit=10000', 'runs.1.json')
 
         i = 2
@@ -312,10 +327,18 @@ def downloadSourceCode(submission_id_list):
 
 
 def dumpSourceCode():
-    if default_config.base_url == '':
+    if not default_config.exported_data.source_code:
         return
 
-    if default_config.exported_data.source_code:
+    if default_config.base_file_path != '':
+        path_name = os.path.join(
+            default_config.base_file_path, submissions_path_name)
+        if os.path.exists(path_name):
+            shutil.copytree(path_name, submissions_dir)
+
+        return
+
+    if default_config.base_url != '':
         total = len(submissions)
         i = 0
 
@@ -614,7 +637,7 @@ def main():
     loadConfig()
     initLogging()
 
-    global headers, base_url, sub_dir_path, submissions_dir
+    global headers, base_url, sub_dir_path, submissions_path_name, submissions_dir
 
     headers = {'Authorization': 'Basic ' +
                base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close'}
@@ -623,9 +646,10 @@ def main():
                        default_config.api_version, 'contests')
 
     sub_dir_path = 'domjudge-api'
+    submissions_path_name = 'submissions'
 
     submissions_dir = os.path.join(
-        default_config.saved_dir, sub_dir_path, 'submissions')
+        default_config.saved_dir, sub_dir_path, submissions_path_name)
 
     if os.path.exists(default_config.saved_dir):
         shutil.rmtree(default_config.saved_dir)
