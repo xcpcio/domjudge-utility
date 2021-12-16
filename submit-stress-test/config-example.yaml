@@ -1,4 +1,6 @@
 base_url: "https://example.com/domjudge/"
 userpwd: "admin:password"
 cid: 1
+
+# Number of rounds submitted
 total: 10
