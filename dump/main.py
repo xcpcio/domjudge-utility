@@ -154,11 +154,11 @@ def requestJson(endpoint, params={}):
 
         res = sendRequest(url, params)
 
-        return res.content.decode('unicode-escape')
+        return res.text
     else:
         file_path = os.path.join(default_config.base_file_path, endpoint)
         logger.info('GET {}'.format(file_path))
-        with open(file_path, 'r', encoding='unicode-escape') as f:
+        with open(file_path, 'r') as f:
             return f.read()
 
 
