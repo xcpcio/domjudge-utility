@@ -72,6 +72,9 @@ class Config:
             self.resolver_data = Config.getConfigWithDefaultCalue(
                 exported_data_dict, 'resolver_data', True)
 
+            self.excel_data = Config.getConfigWithDefaultCalue(
+                exported_data_dict, 'excel_data', False)
+
     def __init__(self, config_dict):
         self.base_file_path = self.getConfigWithDefaultCalue(
             config_dict, 'base_file_path', '')
@@ -469,8 +472,115 @@ def getResolverData(contest, teams, submissions, problems_dict):
     outputToFile('resolver.json', objectToJSONString(resolver_data))
 
 
+def getExcelData(contest, scoreboard, problems_dict, teams_dict):
+    import xlwt
+
+    def get_title_style():
+        font = xlwt.Font()
+        font.name = u'Arial Unicode MS'
+        font.bold = True
+        font.height = 420
+
+        alignment = xlwt.Alignment()
+        alignment.horz = 0x02
+        alignment.vert = 0x01
+
+        borders = xlwt.Borders()
+        borders.left = 1
+        borders.right = 1
+        borders.top = 1
+        borders.bottom = 1
+
+        style = xlwt.XFStyle()
+        style.font = font
+        style.alignment = alignment
+        style.borders = borders
+
+        return style
+
+    def get_content_style():
+        font = xlwt.Font()
+        font.name = u'Arial Unicode MS'
+        font.bold = True
+        font.height = 20 * 11
+
+        alignment = xlwt.Alignment()
+        alignment.horz = 0x02
+        alignment.vert = 0x01
+        alignment.wrap = 1
+
+        borders = xlwt.Borders()
+        borders.left = 1
+        borders.right = 1
+        borders.top = 1
+        borders.bottom = 1
+
+        style = xlwt.XFStyle()
+        style.font = font
+        style.alignment = alignment
+        style.borders = borders
+
+        return style
+
+    sheet_name = contest['formal_name']
+    file_path = os.path.join(default_config.saved_dir,
+                             '{}.xls'.format(sheet_name))
+
+    workbook = xlwt.Workbook(encoding='utf-8')
+    sheet = workbook.add_sheet(sheet_name)
+
+    title_style = get_title_style()
+    content_style = get_content_style()
+
+    row = [['Rank', 'Affiliation', 'Name', 'Solved', 'Penalty']]
+
+    for p in problems:
+        row[0].append(p['label'])
+
+    for item in scoreboard['rows']:
+        team = teams_dict[item['team_id']]
+
+        res = [item['rank'], team['affiliation'], team['name'],
+               item['score']['num_solved'], item['score']['total_time']]
+
+        for p in item['problems']:
+            num_judged = p['num_judged']
+
+            if num_judged == 0:
+                res.append('-')
+            elif p['solved'] == True:
+                res.append('+{}({})'.format(p['num_judged'], p['time']))
+            else:
+                res.append('-{}'.format(p['num_judged']))
+
+        row.append(res)
+
+    row_num = len(row[0])
+    row_max_len = [0] * row_num
+
+    sheet.write_merge(0, 0, 0, row_num - 1, sheet_name, title_style)
+
+    for i in range(len(row)):
+        for j in range(len(row[i])):
+            row_max_len[j] = max(row_max_len[j], len(
+                str(row[i][j]).encode('gb18030')))
+
+    for i in range(len(row)):
+        for j in range(len(row[i])):
+            sheet.write(i + 1, j, row[i][j], content_style)
+
+    # Set adaptive column width
+    for i in range(0, row_num):
+        # 256 * ${words_length}
+        # In order not to appear particularly compact
+        # increase the width of two characters
+        sheet.col(i).width = 256 * (row_max_len[i] + 4)
+
+    workbook.save(file_path)
+
+
 def dump3rdData():
-    if not default_config.exported_data.ghost_dat_data and not default_config.exported_data.resolver_data:
+    if not default_config.exported_data.ghost_dat_data and not default_config.exported_data.resolver_data and not default_config.exported_data.excel_data:
         return
 
     global problems_dict, groups_dict, teams_dict
@@ -495,6 +605,9 @@ def dump3rdData():
     if default_config.exported_data.resolver_data:
         getResolverData(contest, teams, submissions,
                         problems_dict)
+
+    if default_config.exported_data.excel_data:
+        getExcelData(contest, scoreboard, problems_dict, teams_dict)
 
 
 def main():

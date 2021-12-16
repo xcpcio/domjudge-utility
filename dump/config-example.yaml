@@ -5,3 +5,4 @@ add_dummy_russian_team: true
 exported_data:
     runs: true
     source_code: true
+    excel_data: true
