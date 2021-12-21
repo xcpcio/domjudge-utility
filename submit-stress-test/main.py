@@ -81,7 +81,7 @@ def getLanguageByFileExtension(filepath):
     if file_extension in ['java']:
         return 'java'
 
-    if file_extension in ['py, py3']:
+    if file_extension in ['py', 'py3']:
         return 'py3'
 
     return 'unknown'
