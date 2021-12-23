@@ -93,7 +93,7 @@ def submit(pid, filepath):
     language = getLanguageByFileExtension(filepath)
 
     if language == 'unknown':
-        logger.error("unknown language, filepath:{}".format(filepath))
+        logger.error("unknown language. [filepath={}]".format(filepath))
         return
 
     with open(filepath, 'rb') as f:
@@ -110,7 +110,7 @@ def submit(pid, filepath):
         res = requests.post(url=url, headers=headers, data=m)
 
         if res.status_code != 200:
-            logger.error("submit faield, filepath:{}, status_code:{}".format(
+            logger.error("submit faield. [filepath={}, status_code={}]".format(
                 filepath, res.status_code))
 
     pass
@@ -137,7 +137,7 @@ def main():
 
     for i in range(default_config.total):
         logger.info(
-            "start a new round of stress test, round number:{}".format(i))
+            "start a new round of stress test. [round number={}]".format(i))
 
         stress()
 
