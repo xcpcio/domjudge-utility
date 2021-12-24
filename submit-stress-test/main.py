@@ -45,6 +45,9 @@ class Config:
         self.test_data_path = self.getConfigWithDefaultCalue(
             config_dict, 'test_data_path', './test-data')
 
+        self.exclude_pid = self.getConfigWithDefaultCalue(
+            config_dict, 'exclude_pid', [])
+
 
 def loadConfig():
     global default_config
@@ -118,6 +121,9 @@ def submit(pid, filepath):
 
 def stress():
     for dir in os.listdir(default_config.test_data_path):
+        if int(dir) in default_config.exclude_pid:
+            continue
+
         for file in os.listdir(os.path.join(default_config.test_data_path, dir)):
             submit(int(dir), os.path.join(
                 default_config.test_data_path, dir, file))
