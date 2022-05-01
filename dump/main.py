@@ -239,7 +239,7 @@ def dumpDOMjudgeAPI():
 
     if default_config.exported_data.event_feed:
         event_feed = requestJsonAndSave(
-            'event-feed', 'event-feed.json', {'stream': False, 'strict': True})
+            'event-feed', 'event-feed.ndjson', {'stream': False, 'strict': True})
 
 
 def dumpRuns():
