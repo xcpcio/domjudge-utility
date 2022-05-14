@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import base64
+from email.policy import default
 import os
 import json
 import logging
@@ -538,9 +539,11 @@ def getExcelData(contest, scoreboard, problems_dict, teams_dict):
 
         return style
 
-    sheet_name = contest['formal_name']
     file_path = os.path.join(default_config.saved_dir,
-                             '{}.xls'.format(sheet_name))
+                             '{}.xls'.format(contest['formal_name'].replace(' ', '-')))
+
+    sheet_name = "contest-{}".format(default_config.cid)
+    title = contest['formal_name']
 
     workbook = xlwt.Workbook(encoding='utf-8')
     sheet = workbook.add_sheet(sheet_name)
@@ -574,7 +577,7 @@ def getExcelData(contest, scoreboard, problems_dict, teams_dict):
     row_num = len(row[0])
     row_max_len = [0] * row_num
 
-    sheet.write_merge(0, 0, 0, row_num - 1, sheet_name, title_style)
+    sheet.write_merge(0, 0, 0, row_num - 1, title, title_style)
 
     for i in range(len(row)):
         for j in range(len(row[i])):
