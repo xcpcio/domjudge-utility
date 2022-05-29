@@ -395,11 +395,6 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
     team_index = 1
     team_index_dict = {}
 
-    if default_config.add_dummy_russian_team:
-        for i in range(need_dummy_teams):
-            dat_data += '@t {},0,1,Пополнить команду\n'.format(team_index)
-            team_index += 1
-
     for id, team in teams_dict.items():
         affiliation = team['affiliation']
         name = team['name']
@@ -410,6 +405,11 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
 
         dat_data += '@t {},0,1,{} {}{}\n'.format(
             team_id, affiliation, '*' if isObservers(team) else '', name)
+
+    if default_config.add_dummy_russian_team:
+        for i in range(need_dummy_teams):
+            dat_data += '@t {},0,1,Пополнить команду\n'.format(team_index)
+            team_index += 1
 
     teams_submit_index_dict = {}
     for submission in submissions:
