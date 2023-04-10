@@ -35,6 +35,11 @@ class Config:
         self.userpwd = self.getConfigWithDefaultCalue(
             config_dict, 'userpwd', '')
 
+        userpwd = os.getenv("USERPWD", "")
+
+        if len(userpwd) > 0:
+            self.userpwd = userpwd
+
         self.cid = self.getConfigWithDefaultCalue(config_dict, 'cid', 0)
 
         self.api_version = self.getConfigWithDefaultCalue(
@@ -91,7 +96,7 @@ def getLanguageByFileExtension(filepath):
 
 
 def submit(pid, filepath):
-    url = urlJoin(base_url, str(default_config.cid), 'submissions', '/')
+    url = urlJoin(base_url, str(default_config.cid), 'submissions')
 
     language = getLanguageByFileExtension(filepath)
 
@@ -110,13 +115,13 @@ def submit(pid, filepath):
 
         headers['Content-Type'] = m.content_type
 
-        res = requests.post(url=url, headers=headers, data=m)
+        res = requests.post(url=url, headers=headers, data=m, timeout=5)
 
         if res.status_code != 200:
-            logger.error("submit faield. [filepath={}, status_code={}]".format(
+            logger.error("submit faield. [filepath={}] [status_code={}]".format(
                 filepath, res.status_code))
-
-    pass
+        else:
+            logger.info("submit success. [filepath={}]".format(filepath))
 
 
 def stress():
@@ -135,8 +140,11 @@ def main():
 
     global headers, base_url
 
-    headers = {'Authorization': 'Basic ' +
-               base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close'}
+    headers = {
+        'Authorization': 'Basic ' +
+        base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close',
+        'accept': 'application/json',
+    }
 
     base_url = urlJoin(default_config.base_url, 'api',
                        default_config.api_version, 'contests')
