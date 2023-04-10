@@ -118,7 +118,7 @@ def submit(pid, filepath):
         for i in range(3):
             try:
                 res = requests.post(
-                    url=url, headers=headers, data=m, timeout=10)
+                    url=url, headers=headers, data=m, timeout=1)
                 if res.status_code < 200:
                     break
             except Exception as e:
