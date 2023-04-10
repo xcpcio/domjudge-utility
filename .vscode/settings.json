@@ -5,5 +5,10 @@
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
-    "python.formatting.provider": "autopep8"
+    "python.formatting.provider": "autopep8",
+    "cSpell.words": [
+        "buildx",
+        "DOCKERHUB",
+        "domjudge"
+    ]
 }
