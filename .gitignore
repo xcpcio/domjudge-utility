@@ -7,3 +7,4 @@ data/
 data.*/
 
 generate-accounts
+__pycache__
