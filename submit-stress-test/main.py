@@ -119,19 +119,19 @@ def submit(pid, filepath):
             try:
                 res = requests.post(
                     url=url, headers=headers, data=m, timeout=10)
+                if res.status_code < 200:
+                    break
             except Exception as e:
                 logger.error(e)
 
-            if res.status_code >= 500:
-                continue
+        try:
+            if res.status_code != 200:
+                logger.error("submit faield. [filepath={}] [status_code={}]".format(
+                    filepath, res.status_code))
             else:
-                break
-
-        if res.status_code != 200:
-            logger.error("submit faield. [filepath={}] [status_code={}]".format(
-                filepath, res.status_code))
-        else:
-            logger.info("submit success. [filepath={}]".format(filepath))
+                logger.info("submit success. [filepath={}]".format(filepath))
+        except Exception as e:
+            logger.error(e)
 
 
 def stress():
