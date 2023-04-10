@@ -115,7 +115,17 @@ def submit(pid, filepath):
 
         headers['Content-Type'] = m.content_type
 
-        res = requests.post(url=url, headers=headers, data=m, timeout=5)
+        for i in range(3):
+            try:
+                res = requests.post(
+                    url=url, headers=headers, data=m, timeout=10)
+            except Exception as e:
+                logger.error(e)
+
+            if res.status_code >= 500:
+                continue
+            else:
+                break
 
         if res.status_code != 200:
             logger.error("submit faield. [filepath={}] [status_code={}]".format(
@@ -146,6 +156,7 @@ def main():
             'utf-8')).decode('utf-8').strip(),
         'Connection': 'close',
         'accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
     }
 
     base_url = urlJoin(default_config.base_url, 'api',
