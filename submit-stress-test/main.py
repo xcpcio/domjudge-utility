@@ -142,7 +142,9 @@ def main():
 
     headers = {
         'Authorization': 'Basic ' +
-        base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close',
+        base64.encodebytes(default_config.userpwd.encode(
+            'utf-8')).decode('utf-8').strip(),
+        'Connection': 'close',
         'accept': 'application/json',
     }
 
