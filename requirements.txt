@@ -4,5 +4,6 @@ PyYAML
 
 requests
 requests-toolbelt
+grequests
 
 locust
