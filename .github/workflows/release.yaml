@@ -1,16 +1,31 @@
 # yaml-language-server: $schema=https://json-schema.org/draft-07/schema#
-name: Build
+name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "version"
-        required: true
-        default: "latest"
+  push:
+    tags:
+      - "v*"
 
 jobs:
-  build:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - run: npx changelogithub
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  build_docker_image:
     runs-on: ubuntu-latest
 
     steps:
