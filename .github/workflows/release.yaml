@@ -32,10 +32,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set Version
+      - name: Set Tag
         run: |
-          VERSION="${{ github.event.inputs.version }}"
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          tag="${{ github.ref_name }}"
+          echo "${tag}"
+          prefix="v"
+          tag=${tag#"${prefix}"}
+          echo "DOCKER_TAG=${tag}" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -71,4 +74,4 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: dup4/domjudge-tools:${{ env.VERSION }}
+          tags: dup4/domjudge-tools:${{ env.DOCKER_TAG }}
