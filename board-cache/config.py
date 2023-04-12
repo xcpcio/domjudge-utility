@@ -1,4 +1,5 @@
 import yaml
+import os
 
 
 class FetchItem:
@@ -15,7 +16,8 @@ class Config:
 
 
 def load_config() -> Config:
-    with open("./config.yaml", 'r') as f:
+    config_path = os.getenv("CONFIG_FILE_PATH", "./config.yaml")
+    with open(config_path, "r") as f:
         yaml_data = f.read()
 
     data = yaml.load(yaml_data, Loader=yaml.Loader)
