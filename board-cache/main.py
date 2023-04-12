@@ -2,13 +2,15 @@ import os
 import requests
 
 import config
+from logger import init_logger
 
 global_config = config.load_config()
+logger = init_logger()
 
 
 def fetch_html(fetch_item: config.FetchItem):
     url = global_config.url + fetch_item.url_suffix
-    print(url)
+    logger.info("fetch html. [url={}]".format(url))
 
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
