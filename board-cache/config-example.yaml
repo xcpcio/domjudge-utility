@@ -1,0 +1,7 @@
+url: http://127.0.0.1/domjudge/public
+saved_dir: ./data
+fetch_list:
+  - url_suffix: ""
+    dir_name: all
+  - url_suffix: "?categories[]=10&filter=filter"
+    dir_name: benchmark
