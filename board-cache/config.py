@@ -11,11 +11,12 @@ class FetchItem:
 
 
 class Config:
-    def __init__(self, url, url_prefix, saved_dir, assets_url, fetch_list):
+    def __init__(self, url, url_prefix, saved_dir, assets_url, refresh_time, fetch_list):
         self.url = url
         self.url_prefix = url_prefix
         self.saved_dir = saved_dir
         self.assets_url = assets_url
+        self.refresh_time = refresh_time
         self.fetch_list = [FetchItem(**item) for item in fetch_list]
 
 

@@ -2,6 +2,7 @@ url: http://127.0.0.1/domjudge/public
 url_prefix: /domjudge/
 saved_dir: ./data
 assets_url: null
+refresh_time: 1
 fetch_list:
   - url_suffix: "?clear=clear"
     dir_name: all

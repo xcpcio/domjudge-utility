@@ -1,6 +1,7 @@
 import os
 import requests
 import htmlmin
+import time
 
 import config
 from logger import init_logger
@@ -99,8 +100,14 @@ def fetch_html(fetch_item: config.FetchItem):
 
 
 def main():
-    for fetch_item in global_config.fetch_list:
-        fetch_html(fetch_item)
+    while True:
+        try:
+            for fetch_item in global_config.fetch_list:
+                fetch_html(fetch_item)
+        except Exception as e:
+            logger.error(e)
+
+        time.sleep(global_config.refresh_time)
 
 
 if __name__ == "__main__":
