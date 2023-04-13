@@ -57,7 +57,7 @@ class Config:
 def loadConfig():
     global default_config
 
-    config_path = './config.yaml'
+    config_path = os.getenv("CONFIG_FILE_PATH", "./config.yaml")
     with open(config_path, 'r') as f:
         default_config = Config(yaml.load(f, Loader=yaml.FullLoader))
 
