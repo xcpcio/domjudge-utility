@@ -8,7 +8,11 @@
     "python.formatting.provider": "autopep8",
     "cSpell.words": [
         "buildx",
+        "cssmin",
         "DOCKERHUB",
-        "domjudge"
+        "domjudge",
+        "htmlmin",
+        "jsmin",
+        "minifier"
     ]
 }

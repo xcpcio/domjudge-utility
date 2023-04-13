@@ -1,7 +1,13 @@
 url: http://127.0.0.1/domjudge/public
+url_prefix: /domjudge/
 saved_dir: ./data
+assets_url: null
 fetch_list:
-  - url_suffix: ""
+  - url_suffix: "?clear=clear"
     dir_name: all
+    show_name: 全部队伍
+    show_url: /scoreboard
   - url_suffix: "?categories[]=10&filter=filter"
     dir_name: benchmark
+    show_name: Benchmark 队伍
+    show_url: /scoreboard/benchmark
