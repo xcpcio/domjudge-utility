@@ -11,6 +11,7 @@
         "cssmin",
         "DOCKERHUB",
         "domjudge",
+        "grequests",
         "htmlmin",
         "jsmin",
         "minifier"

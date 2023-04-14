@@ -1,7 +1,0 @@
-requests
-grequests
-
-PyYAML
-autopep8
-
-xlwt

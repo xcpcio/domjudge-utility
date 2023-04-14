@@ -5,6 +5,7 @@ config.yaml
 venv/
 data/
 data.*/
+output/
 
 generate-accounts
 __pycache__

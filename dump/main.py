@@ -93,7 +93,7 @@ class Config:
             config_dict, 'api_version', 'v4')
 
         self.saved_dir = self.getConfigWithDefaultCalue(
-            config_dict, 'saved_dir', './data')
+            config_dict, 'saved_dir', './output')
 
         self.score_in_seconds = self.getConfigWithDefaultCalue(
             config_dict, 'score_in_seconds', False)

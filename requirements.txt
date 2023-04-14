@@ -1,13 +1,13 @@
 autopep8
 
 PyYAML
+xlwt
 
 requests
 requests-toolbelt
 grequests
 
-locust
-
+bs4
 htmlmin
 
-bs4
+locust
