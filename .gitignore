@@ -6,6 +6,7 @@ venv/
 data/
 data.*/
 output/
+dist/
 
 generate-accounts
 __pycache__
