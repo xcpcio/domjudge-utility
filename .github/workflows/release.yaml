@@ -74,4 +74,5 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: dup4/domjudge-tools:${{ env.DOCKER_TAG }}
+          tags: |
+            dup4/domjudge-tools:${{ env.DOCKER_TAG }}
