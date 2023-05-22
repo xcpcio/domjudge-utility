@@ -43,6 +43,15 @@ def urlJoin(url, *args):
     return url
 
 
+def image_download(img_url: str, dist: str):
+    from urllib.request import urlretrieve
+    ensureDir(os.path.split(dist)[0])
+
+    logger.info("download image. [img_url=%s] [dist=%s]", img_url, dist)
+
+    urlretrieve(img_url, dist)
+
+
 class Config:
     @staticmethod
     def getConfigWithDefaultCalue(config_dict, key, default_value):
@@ -65,7 +74,10 @@ class Config:
                 exported_data_dict, 'runs', False)
 
             self.source_code = Config.getConfigWithDefaultCalue(
-                exported_data_dict, 'source_code', False)
+                exported_data_dict, 'submissions', False)
+
+            self.images = Config.getConfigWithDefaultCalue(
+                exported_data_dict, 'images', False)
 
             self.ghost_dat_data = Config.getConfigWithDefaultCalue(
                 exported_data_dict, 'ghost_dat_data', False)
@@ -97,9 +109,18 @@ class Config:
         self.score_in_seconds = self.getConfigWithDefaultCalue(
             config_dict, 'score_in_seconds', False)
 
+        # Since Ghost Dat Data with Chinese team names may be garbled
+        # when imported into Codeforces,
+        # We found that if some dummy Russian teams are added, it may works.
+        # This configuration field is only for exporting ghost dat data
+        # defaults to `false`
         self.add_dummy_russian_team = self.getConfigWithDefaultCalue(
             config_dict, 'add_dummy_russian_team', False)
 
+        # Since there are too many requests to send when downloading sourcecode,
+        # we use `grequests` to send in parallel,
+        # this configuration field can set the number of parallel sending
+        # defaults to `100`
         self.grequests_parallels_nums = self.getConfigWithDefaultCalue(
             config_dict, 'grequests_parallels_nums', 100)
 
@@ -355,6 +376,34 @@ def dumpSourceCode():
                 submission_id_list.clear()
 
                 logger.info('Submissions {}/{}'.format(str(i), str(total)))
+
+
+def dumpImages():
+    if not default_config.exported_data.images:
+        return
+
+    # contest
+    if "banner" in contest.keys():
+        for b in contest["banner"]:
+            href = b["href"]
+            image_download(urlJoin(default_config.base_url, "api",
+                           default_config.api_version, href), os.path.join(images_dir, href))
+
+    # organization
+    for o in organizations:
+        if "logo" in o.keys():
+            for logo in o["logo"]:
+                href = logo["href"]
+                image_download(urlJoin(default_config.base_url, "api",
+                               default_config.api_version, href), os.path.join(images_dir, href))
+
+    # team
+    for t in teams:
+        if "photo" in t.keys():
+            for photo in t["photo"]:
+                href = photo["href"]
+                image_download(urlJoin(default_config.base_url, "api",
+                               default_config.api_version, href), os.path.join(images_dir, href))
 
 
 def getGhostDATData(contest, teams_dict, submissions, problems_dict):
@@ -639,7 +688,7 @@ def main():
     loadConfig()
     initLogging()
 
-    global headers, base_url, sub_dir_path, api_path_name, submissions_path_name, assets_path_name, api_dir, submissions_dir, assets_dir
+    global headers, base_url, sub_dir_path, api_path_name, submissions_path_name, images_path_name, api_dir, submissions_dir, images_dir
 
     headers = {'Authorization': 'Basic ' +
                base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close'}
@@ -650,14 +699,14 @@ def main():
     sub_dir_path = 'domjudge'
     api_path_name = "api"
     submissions_path_name = 'submissions'
-    assets_path_name = 'assets'
+    images_path_name = 'images'
 
     api_dir = os.path.join(default_config.saved_dir,
                            sub_dir_path, api_path_name)
     submissions_dir = os.path.join(
         default_config.saved_dir, sub_dir_path, submissions_path_name)
-    assets_dir = os.path.join(default_config.saved_dir,
-                              sub_dir_path, assets_path_name)
+    images_dir = os.path.join(default_config.saved_dir,
+                              sub_dir_path, images_path_name)
 
     if os.path.exists(default_config.saved_dir):
         shutil.rmtree(default_config.saved_dir)
@@ -667,6 +716,7 @@ def main():
     dumpDOMjudgeAPI()
     dumpRuns()
     dumpSourceCode()
+    dumpImages()
     dump3rdData()
 
 
