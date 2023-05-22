@@ -14,11 +14,11 @@ import grequests
 import requests
 
 
-def objectToJSONString(obj):
+def object_to_json_string(obj):
     return json.dumps(obj, sort_keys=False, separators=(',', ':'), ensure_ascii=False)
 
 
-def outputToFile(filepath, data, if_not_exists=False):
+def output_to_file(filepath, data, if_not_exists=False):
     dir_name = os.path.join(default_config.saved_dir, filepath)
 
     if if_not_exists and os.path.exists(dir_name):
@@ -28,12 +28,12 @@ def outputToFile(filepath, data, if_not_exists=False):
         f.write(data)
 
 
-def ensureDir(_path):
+def ensure_dir(_path):
     if not os.path.exists(_path):
         os.makedirs(_path)
 
 
-def urlJoin(url, *args):
+def url_join(url, *args):
     url = url.rstrip('/')
 
     for arg in args:
@@ -45,7 +45,7 @@ def urlJoin(url, *args):
 
 def image_download(img_url: str, dist: str):
     from urllib.request import urlretrieve
-    ensureDir(os.path.split(dist)[0])
+    ensure_dir(os.path.split(dist)[0])
 
     logger.info("download image. [img_url=%s] [dist=%s]", img_url, dist)
 
@@ -163,10 +163,10 @@ def sendRequest(url, params={}):
 
 def requestJson(endpoint, params={}):
     if default_config.base_file_path == '':
-        url = urlJoin(base_url, str(default_config.cid))
+        url = url_join(base_url, str(default_config.cid))
 
         if len(endpoint) > 0:
-            url = urlJoin(url, endpoint)
+            url = url_join(url, endpoint)
 
         logger.info('GET {}'.format(url))
 
@@ -185,8 +185,8 @@ def requestJsonAndSave(endpoint, filename, params={}):
         endpoint if default_config.base_file_path == '' else filename, params=params)
 
     if default_config.exported_data.domjudge_api:
-        ensureDir(api_dir)
-        outputToFile(os.path.join(
+        ensure_dir(api_dir)
+        output_to_file(os.path.join(
             sub_dir_path, api_path_name, filename), content)
 
     try:
@@ -314,11 +314,11 @@ def downloadSourceCode(submission_id_list):
     reqs = []
 
     for submission_id in submission_id_list:
-        url_prefix = urlJoin(base_url, str(default_config.cid),
-                             'submissions', str(submission_id))
-        reqs.append(grequests.get(url=urlJoin(
+        url_prefix = url_join(base_url, str(default_config.cid),
+                              'submissions', str(submission_id))
+        reqs.append(grequests.get(url=url_join(
             url_prefix, 'files'), headers=headers))
-        reqs.append(grequests.get(url=urlJoin(
+        reqs.append(grequests.get(url=url_join(
             url_prefix, 'source-code'), headers=headers))
 
     res_list = grequests.map(reqs, exception_handler=exception_handler)
@@ -357,7 +357,7 @@ def dumpSourceCode():
         total = len(submissions)
         i = 0
 
-        ensureDir(submissions_dir)
+        ensure_dir(submissions_dir)
 
         submission_id_list = []
 
@@ -365,7 +365,7 @@ def dumpSourceCode():
             submission_id = submission['id']
             submission_id_list.append(submission_id)
 
-            ensureDir(os.path.join(submissions_dir, submission_id))
+            ensure_dir(os.path.join(submissions_dir, submission_id))
 
             i = i + 1
             if i % 100 == 0 or i == total:
@@ -386,7 +386,7 @@ def dumpImages():
     if "banner" in contest.keys():
         for b in contest["banner"]:
             href = b["href"]
-            image_download(urlJoin(default_config.base_url, "api",
+            image_download(url_join(default_config.base_url, "api",
                            default_config.api_version, href), os.path.join(images_dir, href))
 
     # organization
@@ -394,7 +394,7 @@ def dumpImages():
         if "logo" in o.keys():
             for logo in o["logo"]:
                 href = logo["href"]
-                image_download(urlJoin(default_config.base_url, "api",
+                image_download(url_join(default_config.base_url, "api",
                                default_config.api_version, href), os.path.join(images_dir, href))
 
     # team
@@ -402,7 +402,7 @@ def dumpImages():
         if "photo" in t.keys():
             for photo in t["photo"]:
                 href = photo["href"]
-                image_download(urlJoin(default_config.base_url, "api",
+                image_download(url_join(default_config.base_url, "api",
                                default_config.api_version, href), os.path.join(images_dir, href))
 
 
@@ -478,7 +478,7 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
         dat_data += '@s {},{},{},{},{}\n'.format(
             team_id, problem_label, team_submit_index, timestamp, verdict)
 
-    outputToFile('contest.dat', dat_data)
+    output_to_file('contest.dat', dat_data)
 
 
 def getResolverData(contest, teams, submissions, problems_dict):
@@ -535,7 +535,7 @@ def getResolverData(contest, teams, submissions, problems_dict):
     resolver_data['solutions'] = solutions
     resolver_data['users'] = users
 
-    outputToFile('resolver.json', objectToJSONString(resolver_data))
+    output_to_file('resolver.json', object_to_json_string(resolver_data))
 
 
 def getExcelData(contest, scoreboard, problems_dict, teams_dict):
@@ -692,8 +692,8 @@ def main():
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
     }
 
-    base_url = urlJoin(default_config.base_url, 'api',
-                       default_config.api_version, 'contests')
+    base_url = url_join(default_config.base_url, 'api',
+                        default_config.api_version, 'contests')
 
     sub_dir_path = 'domjudge'
     api_path_name = "api"
@@ -710,7 +710,7 @@ def main():
     if os.path.exists(default_config.saved_dir):
         shutil.rmtree(default_config.saved_dir)
 
-    ensureDir(default_config.saved_dir)
+    ensure_dir(default_config.saved_dir)
 
     dumpDOMjudgeAPI()
     dumpRuns()
