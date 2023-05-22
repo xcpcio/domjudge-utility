@@ -54,7 +54,7 @@ def image_download(img_url: str, dist: str):
 
 class Config:
     @staticmethod
-    def getConfigWithDefaultCalue(config_dict, key, default_value):
+    def getConfigWithDefaultValue(config_dict, key, default_value):
         if key in config_dict.keys():
             return config_dict[key]
 
@@ -62,51 +62,51 @@ class Config:
 
     class ExportedData:
         def __init__(self, exported_data_dict):
-            self.domjudge_api = Config.getConfigWithDefaultCalue(
+            self.domjudge_api = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'domjudge_api', True)
 
             # Since the export of event-feed may be a bit slow
-            # we do not export by defaut
-            self.event_feed = Config.getConfigWithDefaultCalue(
+            # we do not export by default
+            self.event_feed = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'event_feed', False)
 
-            self.runs = Config.getConfigWithDefaultCalue(
+            self.runs = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'runs', False)
 
-            self.source_code = Config.getConfigWithDefaultCalue(
+            self.source_code = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'submissions', False)
 
-            self.images = Config.getConfigWithDefaultCalue(
+            self.images = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'images', False)
 
-            self.ghost_dat_data = Config.getConfigWithDefaultCalue(
+            self.ghost_dat_data = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'ghost_dat_data', False)
 
-            self.resolver_data = Config.getConfigWithDefaultCalue(
+            self.resolver_data = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'resolver_data', False)
 
-            self.scoreboard_excel_data = Config.getConfigWithDefaultCalue(
+            self.scoreboard_excel_data = Config.getConfigWithDefaultValue(
                 exported_data_dict, 'scoreboard_excel_data', False)
 
     def __init__(self, config_dict):
-        self.base_file_path = self.getConfigWithDefaultCalue(
+        self.base_file_path = self.getConfigWithDefaultValue(
             config_dict, 'base_file_path', '')
 
-        self.base_url = self.getConfigWithDefaultCalue(
+        self.base_url = self.getConfigWithDefaultValue(
             config_dict, 'base_url', '')
 
-        self.userpwd = self.getConfigWithDefaultCalue(
+        self.userpwd = self.getConfigWithDefaultValue(
             config_dict, 'userpwd', '')
 
-        self.cid = self.getConfigWithDefaultCalue(config_dict, 'cid', 0)
+        self.cid = self.getConfigWithDefaultValue(config_dict, 'cid', 0)
 
-        self.api_version = self.getConfigWithDefaultCalue(
+        self.api_version = self.getConfigWithDefaultValue(
             config_dict, 'api_version', 'v4')
 
-        self.saved_dir = self.getConfigWithDefaultCalue(
+        self.saved_dir = self.getConfigWithDefaultValue(
             config_dict, 'saved_dir', './output')
 
-        self.score_in_seconds = self.getConfigWithDefaultCalue(
+        self.score_in_seconds = self.getConfigWithDefaultValue(
             config_dict, 'score_in_seconds', False)
 
         # Since Ghost Dat Data with Chinese team names may be garbled
@@ -114,14 +114,14 @@ class Config:
         # We found that if some dummy Russian teams are added, it may works.
         # This configuration field is only for exporting ghost dat data
         # defaults to `false`
-        self.add_dummy_russian_team = self.getConfigWithDefaultCalue(
+        self.add_dummy_russian_team = self.getConfigWithDefaultValue(
             config_dict, 'add_dummy_russian_team', False)
 
         # Since there are too many requests to send when downloading sourcecode,
         # we use `grequests` to send in parallel,
         # this configuration field can set the number of parallel sending
         # defaults to `100`
-        self.grequests_parallels_nums = self.getConfigWithDefaultCalue(
+        self.grequests_parallels_nums = self.getConfigWithDefaultValue(
             config_dict, 'grequests_parallels_nums', 100)
 
         self.exported_data = Config.ExportedData(
@@ -299,7 +299,7 @@ def dumpRuns():
 
         # Obviously, there will be an empty JSON file
         os.remove(os.path.join(default_config.saved_dir,
-                  sub_dir_path, saved_filename))
+                  sub_dir_path, api_path_name, saved_filename))
 
 
 def downloadSourceCode(submission_id_list):
