@@ -684,8 +684,13 @@ def main():
 
     global headers, base_url, sub_dir_path, api_path_name, submissions_path_name, images_path_name, api_dir, submissions_dir, images_dir
 
-    headers = {'Authorization': 'Basic ' +
-               base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close'}
+    headers = {
+        "Authorization": 'Basic ' +
+        base64.encodebytes(default_config.userpwd.encode(
+            'utf-8')).decode('utf-8').strip(),
+        "Connection": "close",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+    }
 
     base_url = urlJoin(default_config.base_url, 'api',
                        default_config.api_version, 'contests')
