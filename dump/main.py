@@ -648,7 +648,7 @@ def getExcelData(contest, scoreboard, problems_dict, teams_dict):
 
 
 def dump3rdData():
-    if not default_config.exported_data.ghost_dat_data or not default_config.exported_data.resolver_data or not default_config.exported_data.scoreboard_excel_data:
+    if not default_config.exported_data.ghost_dat_data and not default_config.exported_data.resolver_data and not default_config.exported_data.scoreboard_excel_data:
         return
 
     global problems_dict, groups_dict, teams_dict
