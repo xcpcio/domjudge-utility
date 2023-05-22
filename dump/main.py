@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import base64
-from email.policy import default
 import os
 import json
 import logging
@@ -69,13 +68,13 @@ class Config:
                 exported_data_dict, 'source_code', False)
 
             self.ghost_dat_data = Config.getConfigWithDefaultCalue(
-                exported_data_dict, 'ghost_dat_data', True)
+                exported_data_dict, 'ghost_dat_data', False)
 
             self.resolver_data = Config.getConfigWithDefaultCalue(
-                exported_data_dict, 'resolver_data', True)
+                exported_data_dict, 'resolver_data', False)
 
-            self.excel_data = Config.getConfigWithDefaultCalue(
-                exported_data_dict, 'excel_data', False)
+            self.scoreboard_excel_data = Config.getConfigWithDefaultCalue(
+                exported_data_dict, 'scoreboard_excel_data', False)
 
     def __init__(self, config_dict):
         self.base_file_path = self.getConfigWithDefaultCalue(
@@ -165,8 +164,9 @@ def requestJsonAndSave(endpoint, filename, params={}):
         endpoint if default_config.base_file_path == '' else filename, params=params)
 
     if default_config.exported_data.domjudge_api:
-        ensureDir(os.path.join(default_config.saved_dir, sub_dir_path))
-        outputToFile(os.path.join(sub_dir_path, filename), content)
+        ensureDir(api_dir)
+        outputToFile(os.path.join(
+            sub_dir_path, api_path_name, filename), content)
 
     try:
         return json.loads(content)
@@ -599,7 +599,13 @@ def getExcelData(contest, scoreboard, problems_dict, teams_dict):
 
 
 def dump3rdData():
-    if not default_config.exported_data.ghost_dat_data and not default_config.exported_data.resolver_data and not default_config.exported_data.excel_data:
+    if not default_config.exported_data.ghost_dat_data:
+        return
+
+    if not default_config.exported_data.resolver_data:
+        return
+
+    if not default_config.exported_data.scoreboard_excel_data:
         return
 
     global problems_dict, groups_dict, teams_dict
@@ -625,7 +631,7 @@ def dump3rdData():
         getResolverData(contest, teams, submissions,
                         problems_dict)
 
-    if default_config.exported_data.excel_data:
+    if default_config.exported_data.scoreboard_excel_data:
         getExcelData(contest, scoreboard, problems_dict, teams_dict)
 
 
@@ -633,7 +639,7 @@ def main():
     loadConfig()
     initLogging()
 
-    global headers, base_url, sub_dir_path, submissions_path_name, submissions_dir
+    global headers, base_url, sub_dir_path, api_path_name, submissions_path_name, assets_path_name, api_dir, submissions_dir, assets_dir
 
     headers = {'Authorization': 'Basic ' +
                base64.encodebytes(default_config.userpwd.encode('utf-8')).decode('utf-8').strip(), 'Connection': 'close'}
@@ -641,11 +647,17 @@ def main():
     base_url = urlJoin(default_config.base_url, 'api',
                        default_config.api_version, 'contests')
 
-    sub_dir_path = 'domjudge-api'
+    sub_dir_path = 'domjudge'
+    api_path_name = "api"
     submissions_path_name = 'submissions'
+    assets_path_name = 'assets'
 
+    api_dir = os.path.join(default_config.saved_dir,
+                           sub_dir_path, api_path_name)
     submissions_dir = os.path.join(
         default_config.saved_dir, sub_dir_path, submissions_path_name)
+    assets_dir = os.path.join(default_config.saved_dir,
+                              sub_dir_path, assets_path_name)
 
     if os.path.exists(default_config.saved_dir):
         shutil.rmtree(default_config.saved_dir)

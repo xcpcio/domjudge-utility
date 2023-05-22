@@ -1,13 +1,13 @@
 base_url: "https://example.com/domjudge/"
 userpwd: "admin:password"
-cid: 1
 
-# Since Ghost Dat Data with Chinese team names may be garbled
-# when imported into Codeforces,
-# We found that if some dummy Russian teams are added, it may works.
-# This configuration field is only for exporting ghost dat data
-# defaults to `false`
-add_dummy_russian_team: false
+cid: 1
+saved_dir: "./output/1"
+
+exported_data:
+  event_feed: false
+  runs: false
+  source_code: true
 
 # Since there are too many requests to send when downloading sourcecode,
 # we use `grequests` to send in parallel,
@@ -15,7 +15,9 @@ add_dummy_russian_team: false
 # defaults to `100`
 grequests_parallels_nums: 100
 
-exported_data:
-    runs: true
-    source_code: true
-    excel_data: true
+# Since Ghost Dat Data with Chinese team names may be garbled
+# when imported into Codeforces,
+# We found that if some dummy Russian teams are added, it may works.
+# This configuration field is only for exporting ghost dat data
+# defaults to `false`
+add_dummy_russian_team: false
