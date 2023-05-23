@@ -38,6 +38,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [[tool.poetry_bumpversion.replacements]]
-files = ["domjudge_utility/__init__.py"]
+files = ["domjudge_utility/version.py"]
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
