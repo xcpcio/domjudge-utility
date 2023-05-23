@@ -45,7 +45,7 @@ def url_join(url, *args):
 
 class Config:
     @staticmethod
-    def getConfigWithDefaultValue(config_dict, key, default_value):
+    def get_config_with_default_value(config_dict, key, default_value):
         if key in config_dict.keys():
             return config_dict[key]
 
@@ -53,51 +53,51 @@ class Config:
 
     class ExportedData:
         def __init__(self, exported_data_dict):
-            self.domjudge_api = Config.getConfigWithDefaultValue(
+            self.domjudge_api = Config.get_config_with_default_value(
                 exported_data_dict, 'domjudge_api', True)
 
             # Since the export of event-feed may be a bit slow
             # we do not export by default
-            self.event_feed = Config.getConfigWithDefaultValue(
+            self.event_feed = Config.get_config_with_default_value(
                 exported_data_dict, 'event_feed', False)
 
-            self.runs = Config.getConfigWithDefaultValue(
+            self.runs = Config.get_config_with_default_value(
                 exported_data_dict, 'runs', False)
 
-            self.source_code = Config.getConfigWithDefaultValue(
+            self.source_code = Config.get_config_with_default_value(
                 exported_data_dict, 'submissions', False)
 
-            self.images = Config.getConfigWithDefaultValue(
+            self.images = Config.get_config_with_default_value(
                 exported_data_dict, 'images', False)
 
-            self.ghost_dat_data = Config.getConfigWithDefaultValue(
+            self.ghost_dat_data = Config.get_config_with_default_value(
                 exported_data_dict, 'ghost_dat_data', False)
 
-            self.resolver_data = Config.getConfigWithDefaultValue(
+            self.resolver_data = Config.get_config_with_default_value(
                 exported_data_dict, 'resolver_data', False)
 
-            self.scoreboard_excel_data = Config.getConfigWithDefaultValue(
+            self.scoreboard_excel_data = Config.get_config_with_default_value(
                 exported_data_dict, 'scoreboard_excel_data', False)
 
     def __init__(self, config_dict):
-        self.base_file_path = self.getConfigWithDefaultValue(
+        self.base_file_path = self.get_config_with_default_value(
             config_dict, 'base_file_path', '')
 
-        self.base_url = self.getConfigWithDefaultValue(
+        self.base_url = self.get_config_with_default_value(
             config_dict, 'base_url', '')
 
-        self.userpwd = self.getConfigWithDefaultValue(
+        self.userpwd = self.get_config_with_default_value(
             config_dict, 'userpwd', '')
 
-        self.cid = self.getConfigWithDefaultValue(config_dict, 'cid', 0)
+        self.cid = self.get_config_with_default_value(config_dict, 'cid', 0)
 
-        self.api_version = self.getConfigWithDefaultValue(
+        self.api_version = self.get_config_with_default_value(
             config_dict, 'api_version', 'v4')
 
-        self.saved_dir = self.getConfigWithDefaultValue(
+        self.saved_dir = self.get_config_with_default_value(
             config_dict, 'saved_dir', './output')
 
-        self.score_in_seconds = self.getConfigWithDefaultValue(
+        self.score_in_seconds = self.get_config_with_default_value(
             config_dict, 'score_in_seconds', False)
 
         # Since Ghost Dat Data with Chinese team names may be garbled
@@ -105,14 +105,14 @@ class Config:
         # We found that if some dummy Russian teams are added, it may works.
         # This configuration field is only for exporting ghost dat data
         # defaults to `false`
-        self.add_dummy_russian_team = self.getConfigWithDefaultValue(
+        self.add_dummy_russian_team = self.get_config_with_default_value(
             config_dict, 'add_dummy_russian_team', False)
 
         # Since there are too many requests to send when downloading sourcecode,
         # we use `grequests` to send in parallel,
         # this configuration field can set the number of parallel sending
         # defaults to `100`
-        self.grequests_parallels_nums = self.getConfigWithDefaultValue(
+        self.grequests_parallels_nums = self.get_config_with_default_value(
             config_dict, 'grequests_parallels_nums', 100)
 
         self.exported_data = Config.ExportedData(
@@ -141,7 +141,7 @@ def init_logging():
     logger.addHandler(consoleHandler)
 
 
-def sendRequest(url, params={}):
+def send_request(url, params={}):
     res = requests.get(url=url, headers=headers, params=params)
 
     if res.status_code != 200:
@@ -152,7 +152,7 @@ def sendRequest(url, params={}):
     return res
 
 
-def requestJson(endpoint, params={}):
+def request_json(endpoint, params={}):
     if default_config.base_file_path == '':
         url = url_join(base_url, str(default_config.cid))
 
@@ -161,7 +161,7 @@ def requestJson(endpoint, params={}):
 
         logger.info('GET {}'.format(url))
 
-        resp = sendRequest(url, params)
+        resp = send_request(url, params)
 
         content_type = resp.headers.get("Content-Type")
 
@@ -183,14 +183,14 @@ def image_download(img_url: str, dist: str):
     logger.info("download image. [img_url=%s] [dist=%s]", img_url, dist)
 
     ensure_dir(os.path.split(dist)[0])
-    res = sendRequest(img_url)
+    res = send_request(img_url)
 
     with open(dist, 'wb') as f:
         f.write(res.content)
 
 
 def request_json_and_save(endpoint, filename, params={}):
-    content = requestJson(
+    content = request_json(
         endpoint if default_config.base_file_path == '' else filename, params=params)
 
     if default_config.exported_data.domjudge_api:
@@ -208,7 +208,7 @@ def request_json_and_save(endpoint, filename, params={}):
         return content
 
 
-def addVerdict(submissions, judgements):
+def add_verdict(submissions, judgements):
     submissions_verdict = {}
     for judgement in judgements:
         id = judgement['submission_id']
@@ -226,22 +226,22 @@ def addVerdict(submissions, judgements):
             submission['verdict'] = submissions_verdict[id]
 
 
-def getSeconds(t):
+def get_seconds(t):
     h, m, s = t.strip().split(":")
     return math.floor(int(h) * 3600 + int(m) * 60 + math.floor(float(s)))
 
 
-def getSubmissionTimestamp(t):
+def get_submission_timestamp(t):
     h, m, s = t.strip().split(":")
     timestamp = int(h) * 3600 + int(m) * 60
 
     if default_config.score_in_seconds:
-        timestamp += math.floot(float(s))
+        timestamp += math.floor(float(s))
 
     return timestamp
 
 
-def isObservers(team):
+def is_observers(team):
     for group_id in team['group_ids']:
         if groups_dict[group_id]['name'] == 'Observers':
             return True
@@ -249,7 +249,7 @@ def isObservers(team):
     return False
 
 
-def dumpDOMjudgeAPI():
+def dump_domjudge_api():
     global contest, awards, scoreboard, groups, judgements
     global judgement_types, languages, organizations, problems, teams, submissions
     global clarifications, event_feed
@@ -277,7 +277,7 @@ def dumpDOMjudgeAPI():
             'event-feed', 'event-feed.ndjson', {'stream': False, 'strict': True})
 
 
-def dumpRuns():
+def dump_runs():
     if not default_config.exported_data.runs:
         return
 
@@ -315,7 +315,7 @@ def dumpRuns():
                   sub_dir_path, api_path_name, saved_filename))
 
 
-def downloadSourceCode(submission_id_list):
+def download_source_code(submission_id_list):
     err_list = []
 
     def exception_handler(request, exception):
@@ -354,7 +354,7 @@ def downloadSourceCode(submission_id_list):
     return True
 
 
-def dumpSourceCode():
+def dump_source_code():
     if not default_config.exported_data.source_code:
         return
 
@@ -382,7 +382,7 @@ def dumpSourceCode():
 
             i = i + 1
             if i % 100 == 0 or i == total:
-                while not downloadSourceCode(submission_id_list):
+                while not download_source_code(submission_id_list):
                     time.sleep(1)
                     logger.info("retrying")
 
@@ -391,7 +391,7 @@ def dumpSourceCode():
                 logger.info('Submissions {}/{}'.format(str(i), str(total)))
 
 
-def dumpImages():
+def dump_images():
     if not default_config.exported_data.images:
         return
 
@@ -419,7 +419,7 @@ def dumpImages():
                                default_config.api_version, href), os.path.join(images_dir, href))
 
 
-def getGhostDATData(contest, teams_dict, submissions, problems_dict):
+def get_ghost_dat_data(contest, teams_dict, submissions, problems_dict):
     verdict_mapping = {
         'CE': 'CE',
         'MLE': 'ML',
@@ -443,7 +443,7 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
 
     dat_data += '@contest "{}"\n'.format(contest['formal_name'])
     dat_data += '@contlen {}\n'.format(
-        int(getSeconds(contest['duration']) // 60))
+        int(get_seconds(contest['duration']) // 60))
     dat_data += '@problems {}\n'.format(len(problems_dict))
     dat_data += '@teams {}\n'.format(team_nums)
     dat_data += '@submissions {}\n'.format(len(submissions))
@@ -466,7 +466,7 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
         team_index_dict[id] = team_id
 
         dat_data += '@t {},0,1,{} {}{}\n'.format(
-            team_id, affiliation, '*' if isObservers(team) else '', name)
+            team_id, affiliation, '*' if is_observers(team) else '', name)
 
     if default_config.add_dummy_russian_team:
         for i in range(need_dummy_teams):
@@ -484,7 +484,7 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
             teams_submit_index_dict[team_id] = 1
 
         team_submit_index = teams_submit_index_dict[team_id]
-        timestamp = getSubmissionTimestamp(submission['contest_time'])
+        timestamp = get_submission_timestamp(submission['contest_time'])
 
         verdict = verdict_mapping[submission['verdict']]
 
@@ -494,12 +494,12 @@ def getGhostDATData(contest, teams_dict, submissions, problems_dict):
     output_to_file('contest.dat', dat_data)
 
 
-def getResolverData(contest, teams, submissions, problems_dict):
+def get_resolver_data(contest, teams, submissions, problems_dict):
     resolver_data = {}
     resolver_data["contest_name"] = contest["formal_name"]
     resolver_data["problem_count"] = len(problems_dict)
-    resolver_data["frozen_seconds"] = getSeconds(
-        contest["duration"]) - getSeconds(contest["scoreboard_freeze_duration"])
+    resolver_data["frozen_seconds"] = get_seconds(
+        contest["duration"]) - get_seconds(contest["scoreboard_freeze_duration"])
 
     users = {}
     solutions = {}
@@ -508,7 +508,7 @@ def getResolverData(contest, teams, submissions, problems_dict):
         item = {}
         item['name'] = team['name']
         item['college'] = team['affiliation']
-        item['is_exclude'] = isObservers(team)
+        item['is_exclude'] = is_observers(team)
 
         users[team['id']] = item
 
@@ -524,11 +524,11 @@ def getResolverData(contest, teams, submissions, problems_dict):
             continue
 
         item = {}
-        item['submitted_seconds'] = getSubmissionTimestamp(
+        item['submitted_seconds'] = get_submission_timestamp(
             submission['contest_time'])
 
         # TOO LATE submission
-        if item['submitted_seconds'] > getSeconds(contest["duration"]):
+        if item['submitted_seconds'] > get_seconds(contest["duration"]):
             continue
 
         item['user_id'] = submission['team_id']
@@ -551,7 +551,7 @@ def getResolverData(contest, teams, submissions, problems_dict):
     output_to_file('resolver.json', object_to_json_string(resolver_data))
 
 
-def getExcelData(contest, scoreboard, problems_dict, teams_dict):
+def get_excel_data(contest, scoreboard, problems_dict, teams_dict):
     import xlwt
 
     def get_title_style():
@@ -660,7 +660,7 @@ def getExcelData(contest, scoreboard, problems_dict, teams_dict):
     workbook.save(file_path)
 
 
-def dump3rdData():
+def dump_3rd_data():
     if not default_config.exported_data.ghost_dat_data and not default_config.exported_data.resolver_data and not default_config.exported_data.scoreboard_excel_data:
         return
 
@@ -678,17 +678,17 @@ def dump3rdData():
     for team in teams:
         teams_dict[team['id']] = team
 
-    addVerdict(submissions, judgements)
+    add_verdict(submissions, judgements)
 
     if default_config.exported_data.ghost_dat_data:
-        getGhostDATData(contest, teams_dict, submissions, problems_dict)
+        get_ghost_dat_data(contest, teams_dict, submissions, problems_dict)
 
     if default_config.exported_data.resolver_data:
-        getResolverData(contest, teams, submissions,
-                        problems_dict)
+        get_resolver_data(contest, teams, submissions,
+                          problems_dict)
 
     if default_config.exported_data.scoreboard_excel_data:
-        getExcelData(contest, scoreboard, problems_dict, teams_dict)
+        get_excel_data(contest, scoreboard, problems_dict, teams_dict)
 
 
 def main():
@@ -725,11 +725,11 @@ def main():
 
     ensure_dir(default_config.saved_dir)
 
-    dumpDOMjudgeAPI()
-    dumpRuns()
-    dumpSourceCode()
-    dumpImages()
-    dump3rdData()
+    dump_domjudge_api()
+    dump_runs()
+    dump_source_code()
+    dump_images()
+    dump_3rd_data()
 
 
 if __name__ == '__main__':
