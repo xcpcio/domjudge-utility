@@ -666,11 +666,7 @@ class Dump:
 
         workbook.save(file_path)
 
-    def dump_3rd_data(self):
-        ex = self.config.exported_data
-        if not any([ex.ghost_dat_data, ex.resolver_data, ex.scoreboard_excel_data]):
-            return
-
+    def process_domjudge_raw_data(self):
         self.problems_dict = {}
         for problem in self.problems:
             self.problems_dict[problem['id']] = problem
@@ -684,6 +680,13 @@ class Dump:
             self.teams_dict[team['id']] = team
 
         self.add_verdict(self.submissions, self.judgements)
+
+    def dump_3rd_data(self):
+        ex = self.config.exported_data
+        if not any([ex.ghost_dat_data, ex.resolver_data, ex.scoreboard_excel_data]):
+            return
+
+        self.process_domjudge_raw_data()
 
         if self.config.exported_data.ghost_dat_data:
             self.get_ghost_dat_data(
