@@ -9,3 +9,8 @@ exported_data:
   runs: true
   submissions: true
   images: true
+  ghost_dat_data: true
+  resolver_data: true
+  scoreboard_excel_data: true
+
+add_dummy_russian_team: true

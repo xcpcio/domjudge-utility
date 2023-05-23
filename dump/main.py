@@ -18,7 +18,7 @@ def object_to_json_string(obj):
     return json.dumps(obj, sort_keys=False, separators=(',', ':'), ensure_ascii=False)
 
 
-def output_to_file(filepath, data, if_not_exists=False):
+def output_to_file(filepath: str, data: str, if_not_exists=False):
     dir_name = os.path.join(default_config.saved_dir, filepath)
 
     if if_not_exists and os.path.exists(dir_name):
@@ -41,15 +41,6 @@ def url_join(url, *args):
         url = "{}/{}".format(url, arg)
 
     return url
-
-
-def image_download(img_url: str, dist: str):
-    from urllib.request import urlretrieve
-    ensure_dir(os.path.split(dist)[0])
-
-    logger.info("download image. [img_url=%s] [dist=%s]", img_url, dist)
-
-    urlretrieve(img_url, dist)
 
 
 class Config:
@@ -128,7 +119,7 @@ class Config:
             config_dict['exported_data'] if 'exported_data' in config_dict.keys() else {})
 
 
-def loadConfig():
+def load_config():
     global default_config
 
     config_path = './config.yaml'
@@ -136,7 +127,7 @@ def loadConfig():
         default_config = Config(yaml.load(f, Loader=yaml.FullLoader))
 
 
-def initLogging():
+def init_logging():
     global logger
 
     logger = logging.getLogger(__name__)
@@ -170,9 +161,17 @@ def requestJson(endpoint, params={}):
 
         logger.info('GET {}'.format(url))
 
-        res = sendRequest(url, params)
+        resp = sendRequest(url, params)
 
-        return res.text
+        content_type = resp.headers.get("Content-Type")
+
+        if "charset" in content_type:
+            charset = content_type.split("charset=")[1]
+            content = resp.content.decode(charset)
+        else:
+            content = resp.content.decode()
+
+        return content
     else:
         file_path = os.path.join(default_config.base_file_path, endpoint)
         logger.info('GET {}'.format(file_path))
@@ -180,7 +179,17 @@ def requestJson(endpoint, params={}):
             return f.read()
 
 
-def requestJsonAndSave(endpoint, filename, params={}):
+def image_download(img_url: str, dist: str):
+    logger.info("download image. [img_url=%s] [dist=%s]", img_url, dist)
+
+    ensure_dir(os.path.split(dist)[0])
+    res = sendRequest(img_url)
+
+    with open(dist, 'wb') as f:
+        f.write(res.content)
+
+
+def request_json_and_save(endpoint, filename, params={}):
     content = requestJson(
         endpoint if default_config.base_file_path == '' else filename, params=params)
 
@@ -190,7 +199,10 @@ def requestJsonAndSave(endpoint, filename, params={}):
             sub_dir_path, api_path_name, filename), content)
 
     try:
-        return json.loads(content)
+        if filename.endswith(".json"):
+            return json.loads(content)
+        else:
+            return content
     except Exception as err:
         logger.error(err)
         return content
@@ -242,25 +254,26 @@ def dumpDOMjudgeAPI():
     global judgement_types, languages, organizations, problems, teams, submissions
     global clarifications, event_feed
 
-    contest = requestJsonAndSave('', 'contest.json')
-    awards = requestJsonAndSave('awards', 'awards.json')
-    scoreboard = requestJsonAndSave('scoreboard', 'scoreboard.json')
+    contest = request_json_and_save('', 'contest.json')
+    awards = request_json_and_save('awards', 'awards.json')
+    scoreboard = request_json_and_save('scoreboard', 'scoreboard.json')
 
-    groups = requestJsonAndSave('groups', 'groups.json')
-    judgements = requestJsonAndSave('judgements', 'judgements.json')
-    judgement_types = requestJsonAndSave(
+    groups = request_json_and_save('groups', 'groups.json')
+    judgements = request_json_and_save('judgements', 'judgements.json')
+    judgement_types = request_json_and_save(
         'judgement-types', 'judgement-types.json')
-    languages = requestJsonAndSave('languages', 'languages.json')
-    organizations = requestJsonAndSave('organizations', 'organizations.json')
-    problems = requestJsonAndSave('problems', 'problems.json')
-    teams = requestJsonAndSave('teams', 'teams.json')
-    submissions = requestJsonAndSave('submissions', 'submissions.json')
+    languages = request_json_and_save('languages', 'languages.json')
+    organizations = request_json_and_save(
+        'organizations', 'organizations.json')
+    problems = request_json_and_save('problems', 'problems.json')
+    teams = request_json_and_save('teams', 'teams.json')
+    submissions = request_json_and_save('submissions', 'submissions.json')
 
-    clarifications = requestJsonAndSave(
+    clarifications = request_json_and_save(
         'clarifications', 'clarifications.json')
 
     if default_config.exported_data.event_feed:
-        event_feed = requestJsonAndSave(
+        event_feed = request_json_and_save(
             'event-feed', 'event-feed.ndjson', {'stream': False, 'strict': True})
 
 
@@ -283,7 +296,7 @@ def dumpRuns():
         return
 
     if default_config.base_url != '':
-        runs = requestJsonAndSave('runs?limit=10000', 'runs.1.json')
+        runs = request_json_and_save('runs?limit=10000', 'runs.1.json')
 
         i = 2
         saved_filename = ''
@@ -294,7 +307,7 @@ def dumpRuns():
 
             saved_filename = 'runs.{}.json'.format(str(i))
 
-            runs = requestJsonAndSave(endpoint, saved_filename)
+            runs = request_json_and_save(endpoint, saved_filename)
             i = i + 1
 
         # Obviously, there will be an empty JSON file
@@ -679,8 +692,8 @@ def dump3rdData():
 
 
 def main():
-    loadConfig()
-    initLogging()
+    load_config()
+    init_logging()
 
     global headers, base_url, sub_dir_path, api_path_name, submissions_path_name, images_path_name, api_dir, submissions_dir, images_dir
 
