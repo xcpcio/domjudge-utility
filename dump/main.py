@@ -604,7 +604,7 @@ def getExcelData(contest, scoreboard, problems_dict, teams_dict):
     file_path = os.path.join(default_config.saved_dir,
                              '{}.xls'.format(contest['formal_name'].replace(' ', '-')))
 
-    sheet_name = "contest-{}".format(default_config.cid)
+    sheet_name = "scoreboard"
     title = contest['formal_name']
 
     workbook = xlwt.Workbook(encoding='utf-8')
