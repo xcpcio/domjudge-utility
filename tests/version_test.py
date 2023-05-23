@@ -1,4 +1,4 @@
-from domjudge_utility import __version__
+from domjudge_utility.version import __version__
 
 
 def test_version():
