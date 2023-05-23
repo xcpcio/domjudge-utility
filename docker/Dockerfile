@@ -1,8 +1,8 @@
 FROM python:3.11-bullseye
 
 USER root
-WORKDIR /domjudge-tools
-COPY . /domjudge-tools
+WORKDIR /domjudge-utility
+COPY . /domjudge-utility
 COPY ./docker/bin /
 
 ENV DEBIAN_FRONTEND noninteractive
