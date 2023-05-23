@@ -15,7 +15,9 @@
         "grequests",
         "htmlmin",
         "jsmin",
-        "minifier"
+        "judgements",
+        "minifier",
+        "reqs"
     ],
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
