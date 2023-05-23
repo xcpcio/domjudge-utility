@@ -62,6 +62,8 @@ class Dump:
         self.groups_dict = None
         self.teams_dict = None
 
+        self.logger = None
+
     def output_to_file(self, filepath: str, data: str, if_not_exists=False):
         dir_name = os.path.join(self.config.saved_dir, filepath)
 
@@ -72,6 +74,9 @@ class Dump:
             f.write(data)
 
     def init_logging(self):
+        if self.logger is not None:
+            return
+
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
 
@@ -113,7 +118,7 @@ class Dump:
 
             return content
         else:
-            file_path = os.path.join(self.config.base_file_path, endpoint)
+            file_path = os.path.join(self.config.base_file_path, "domjudge", "api", endpoint)
             self.logger.info('GET {}'.format(file_path))
             with open(file_path, 'r') as f:
                 return f.read()
@@ -636,3 +641,10 @@ class Dump:
         self.dump_source_code()
         self.dump_images()
         self.dump_3rd_data()
+
+    def load_domjudge_api(self):
+        self.config.exported_data.domjudge_api = False
+
+        self.init_logging()
+        self.dump_domjudge_api()
+        self.process_domjudge_raw_data()

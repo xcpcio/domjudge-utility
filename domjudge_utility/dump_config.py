@@ -34,7 +34,7 @@ class DumpConfig:
             self.scoreboard_excel_data = DumpConfig.get_config_with_default_value(
                 exported_data_dict, 'scoreboard_excel_data', False)
 
-    def __init__(self, config_dict):
+    def __init__(self, config_dict={}):
         self.base_file_path = self.get_config_with_default_value(
             config_dict, 'base_file_path', '')
 
