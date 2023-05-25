@@ -17,7 +17,8 @@
         "jsmin",
         "judgements",
         "minifier",
-        "reqs"
+        "reqs",
+        "xcpcio"
     ],
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
