@@ -118,7 +118,8 @@ class Dump:
 
             return content
         else:
-            file_path = os.path.join(self.config.base_file_path, "domjudge", "api", endpoint)
+            file_path = os.path.join(
+                self.config.base_file_path, "domjudge", "api", endpoint)
             self.logger.info('GET {}'.format(file_path))
             with open(file_path, 'r') as f:
                 return f.read()

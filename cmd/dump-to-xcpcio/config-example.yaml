@@ -1,0 +1,6 @@
+base_url: "https://example.com/domjudge/"
+userpwd: "admin:password"
+
+cid: 1
+
+xcpcio_token: your-token
