@@ -11,6 +11,9 @@ class DumpConfig:
             self.domjudge_api = DumpConfig.get_config_with_default_value(
                 exported_data_dict, 'domjudge_api', True)
 
+            self.domjudge_api_clarifications = DumpConfig.get_config_with_default_value(
+                exported_data_dict, "domjudge_api_clarifications", False)
+
             # Since the export of event-feed may be a bit slow
             # we do not export by default
             self.event_feed = DumpConfig.get_config_with_default_value(

@@ -209,8 +209,9 @@ class Dump:
         self.submissions = self.request_json_and_save(
             'submissions', 'submissions.json')
 
-        self.clarifications = self.request_json_and_save(
-            'clarifications', 'clarifications.json')
+        if self.config.exported_data.domjudge_api_clarifications:
+            self.clarifications = self.request_json_and_save(
+                'clarifications', 'clarifications.json')
 
         if self.config.exported_data.event_feed:
             self.event_feed = self.request_json_and_save(
@@ -645,6 +646,7 @@ class Dump:
 
     def load_domjudge_api(self):
         self.config.exported_data.domjudge_api = False
+        self.config.exported_data.domjudge_api_clarifications = False
 
         self.init_logging()
         self.dump_domjudge_api()
