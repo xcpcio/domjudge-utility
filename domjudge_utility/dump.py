@@ -445,7 +445,7 @@ class Dump:
 
         for team in teams:
             item = {}
-            item['name'] = team['name']
+            item['name'] = team['display_name']
             item['college'] = team['affiliation']
             item['is_exclude'] = self.is_observers(team)
 
