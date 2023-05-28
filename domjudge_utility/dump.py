@@ -445,7 +445,12 @@ class Dump:
 
         for team in teams:
             item = {}
-            item['name'] = team['display_name']
+
+            if team["display_name"] is not None and len(team["display_name"]) > 0:
+                item['name'] = team['display_name']
+            else:
+                item["name"] = team["name"]
+
             item['college'] = team['affiliation']
             item['is_exclude'] = self.is_observers(team)
 
