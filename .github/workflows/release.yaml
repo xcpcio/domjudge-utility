@@ -106,4 +106,4 @@ jobs:
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
-            docker.io/dup4/domjudge-utility:${{ env.DOCKER_TAG }}
+            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/domjudge-utility:${{ env.DOCKER_TAG }}
