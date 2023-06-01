@@ -1,0 +1,6 @@
+autopep8
+
+requests
+
+bs4
+htmlmin
