@@ -11,7 +11,7 @@
 
 ## License
 
-[MIT](./LICENSE) License © 2021 [XCPCIO][xcpcio]
+[MIT](./LICENSE) License © 2020 - PRESENT [XCPCIO][xcpcio]
 
 [xcpcio]: https://github.com/XCPCIO
 [test-ci-badge]: https://github.com/XCPCIO/domjudge-utility/workflows/Test/badge.svg
