@@ -17,6 +17,7 @@
         "judgements",
         "KHTML",
         "minifier",
+        "ndjson",
         "reqs",
         "userpwd",
         "xcpcio"
