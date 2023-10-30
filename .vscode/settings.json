@@ -15,6 +15,7 @@
         "htmlmin",
         "jsmin",
         "judgements",
+        "KHTML",
         "minifier",
         "reqs",
         "userpwd",
