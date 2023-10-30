@@ -152,22 +152,29 @@ class Dump:
             self.logger.error(err)
             return content
 
-    def add_verdict(self, submissions, judgements):
-        submissions_verdict = {}
-        for judgement in judgements:
+    def add_more_fields_for_submission(self):
+        submissions_judgement_map = {}
+        for judgement in self.judgements:
             id = judgement['submission_id']
-            verdict = judgement['judgement_type_id']
+            submissions_judgement_map[id] = judgement
 
-            submissions_verdict[id] = verdict
-
-        for submission in submissions:
+        for submission in self.submissions:
             id = submission['id']
 
+            language_id = submission['language_id']
+            for l in self.languages:
+                if language_id == l["id"]:
+                    submission['language_name'] = l['name']
+                    break
+
             # Pending
-            if id not in submissions_verdict.keys():
+            if id not in submissions_judgement_map.keys():
                 submission['verdict'] = 'PD'
+                submission['max_run_time'] = 0
             else:
-                submission['verdict'] = submissions_verdict[id]
+                judgement = submissions_judgement_map[id]
+                submission['verdict'] = judgement["judgement_type_id"]
+                submission['max_run_time'] = judgement['max_run_time']
 
     def get_seconds(self, t):
         h, m, s = t.strip().split(":")
@@ -616,7 +623,7 @@ class Dump:
         for team in self.teams:
             self.teams_dict[team['id']] = team
 
-        self.add_verdict(self.submissions, self.judgements)
+        self.add_more_fields_for_submission()
 
     def dump_3rd_data(self):
         ex = self.config.exported_data
