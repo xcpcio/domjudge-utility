@@ -3,7 +3,7 @@
 ## Usage
 
 ```bash
-git clone https://github.com/XCPCIO/domjudge-utility.git
+git clone https://github.com/xcpcio/domjudge-utility.git
 
 cd domjudge-utility/submit-stress-test
 
