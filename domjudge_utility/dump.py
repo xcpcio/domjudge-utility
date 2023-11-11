@@ -93,7 +93,8 @@ class Dump:
         if res.status_code != 200:
             self.logger.error('An error occurred during request GET {}, errcode:{}'.format(
                 url, res.status_code))
-            exit()
+            raise RuntimeError(
+                "fetch failed. [url={}] [status_code={}]".format(url, res.status_code))
 
         return res
 
