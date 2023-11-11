@@ -36,7 +36,13 @@ def upload_all(c: Config, d: Dump):
     extra_files = {}
 
     contest = dump(d, '', 'contest.json', extra_files)
-    awards = dump(d, 'awards', 'awards.json', extra_files)
+
+    try:
+        awards = dump(d, 'awards', 'awards.json', extra_files)
+    except Exception as e:
+        d.logger.error(e)
+        extra_files["awards.json"] = "[]"
+
     scoreboard = dump(d, 'scoreboard', 'scoreboard.json', extra_files)
 
     groups = dump(d, 'groups', 'groups.json', extra_files)
