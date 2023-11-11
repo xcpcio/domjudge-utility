@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "domjudge-utility"
-version = "0.0.13"
+version = "0.0.14"
 description = "DOMjudge Utility"
 authors = ["Dup4 <lyuzhi.pan@gmail.com>"]
 license = "MIT"
