@@ -14,8 +14,10 @@ pip3 install -U -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
 ```
 
 ## Example
-```
+
 * [48沈阳手册parse示例](../tests/pdf_parser)
+
+```
 
 python3 extract.py -h
 
