@@ -7,5 +7,5 @@
 用48th沈阳做个测试。
 
 ```bash
-python3 ..\..\pdf_parser\extract.py .\48沈阳.pdf --auto --format ALL --output "./沈阳"
+python3 ../../pdf_parser/extract.py ./48沈阳.pdf --auto --format ALL --output "./沈阳"
 ```
