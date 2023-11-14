@@ -8,7 +8,7 @@
 * [board-cache](./board-cache/)
 * [dump](./dump)
 * [submit-stress-test](./submit-stress-test)
-
+* [pdf_parser](./pdf_parser)
 ## License
 
 [MIT](./LICENSE) License © 2020 - PRESENT [XCPCIO][xcpcio]
