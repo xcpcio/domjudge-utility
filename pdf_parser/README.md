@@ -11,6 +11,14 @@ cd domjudge-utility/pdf_parser
 
 pip3 install -U -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
 
-# python3 extract.py a.pdf --auto/--pages [--format ALL/csv/xlcx] [--output ./output]
+```
+
+## Example
+```
+* [48沈阳手册parse示例](../tests/pdf_parser)
+
 python3 extract.py -h
+
+python3 extract.py a.pdf --auto/--pages [--format ALL/csv/xlcx] [--output ./output]
+
 ```
