@@ -20,6 +20,7 @@
         "KHTML",
         "minifier",
         "ndjson",
+        "pdfplumber",
         "reqs",
         "userpwd",
         "xcpcio"
