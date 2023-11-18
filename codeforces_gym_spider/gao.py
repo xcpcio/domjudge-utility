@@ -119,7 +119,7 @@ def login(session):
     soup = bs(page.text, 'html.parser')
     time.sleep(2)
     data = {}
-    token = soup.find('input', {"name":"csrf_token"})["value"]
+    token = soup.find('input', {"name":"csrf_ token"})["value"]
     data['handleOrEmail'] = cf_handle
     data['password'] = cf_password
     data['csrf_token'] = token
@@ -228,6 +228,7 @@ def main():
                 info('Time Escaped %ds. ET: %ds.'%(passed, et))
     
     print('Done. Succeed: %d, Total: %d'%(succeed, len(submissions)))
+    return True
 
 while not main():
     pass
