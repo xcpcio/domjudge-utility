@@ -211,6 +211,7 @@ def main():
                 except Exception as e:
                     warn('Download failed: ' + str(e))
                     time.sleep(2)
+                    continue
                 break
             count = count + 1
             if downloaded:
