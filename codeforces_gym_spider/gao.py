@@ -228,6 +228,7 @@ def main():
                 info('Time Escaped %ds. ET: %ds.'%(passed, et))
     
     print('Done. Succeed: %d, Total: %d'%(succeed, len(submissions)))
+    return True
 
 while not main():
     pass
