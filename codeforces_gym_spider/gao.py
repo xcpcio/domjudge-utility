@@ -113,6 +113,9 @@ def login(session):
         cf_handle = input('Enter your codeforces handle: ')
         cf_password = getpass.getpass('Enter your codeforces password: ')
     page = session.get('https://codeforces.com/enter')
+    if '403 Forbidden' in page.text:
+        error('IP Blocked')
+        raise IPBlockedException()
     soup = bs(page.text, 'html.parser')
     time.sleep(2)
     data = {}
@@ -138,6 +141,7 @@ def get_source_code(session, sub):
     url = 'https://codeforces.com/gym/%s/submission/%s'%(sub['contestId'], sub['id'])
     page = session.get(url)
     if '403 Forbidden' in page.text:
+        error('IP Blocked')
         raise IPBlockedException()
     soup = bs(page.text, 'html.parser')
     code_area = soup.find(id = 'program-source-text')
@@ -175,11 +179,8 @@ def download_submission(session, sub):
     info('Downloaded ' + sub_path)
     return True
 
-succeed = 0
-count = 0
-
 def main():
-    global succeed, count
+    global cf_handle, cf_password
     succeed = 0
     count = 0
     time_start = time.time()
@@ -187,6 +188,9 @@ def main():
         while not login(session):
             if not get_input('Try again? (y/n)'):
                 exit(4)
+            else:
+                cf_handle = input('Enter your codeforces handle: ')
+                cf_password = getpass.getpass('Enter your codeforces password: ')
         for sub in submissions:
             chk_before = time.time()
             for retry in range(3):
@@ -194,17 +198,16 @@ def main():
                     downloaded = download_submission(session, sub)
                     succeed = succeed + 1
                 except IPBlockedException:
+                    change_account = None
                     try:
                         change_account=inputimeout(prompt='IP Being Blocked, Input ANY KEY to change account. Will use the same account after 10s if no action:', timeout=10)
                     except TimeoutOccurred:
                         pass
                     finally:
                         if change_account is not None:
-                            global cf_handle, cf_password
                             cf_handle = input('Enter your new codeforces handle: ')
                             cf_password = getpass.getpass('Enter your new codeforces password: ')
                         else:
-                            
                             warn('IP Blocked. Retry after 60s with the same account.')
                             time.sleep(60)
                     return False
@@ -223,9 +226,9 @@ def main():
             info('[%d/%d] Processed. %d Succeeded.'%(count, len(submissions), succeed))
             if count % 10 == 0:
                 info('Time Escaped %ds. ET: %ds.'%(passed, et))
-
+    
+    print('Done. Succeed: %d, Total: %d'%(succeed, len(submissions)))
 
 while not main():
     pass
 
-print('Done. Succeed: %d, Total: %d'%(succeed, len(submissions)))
