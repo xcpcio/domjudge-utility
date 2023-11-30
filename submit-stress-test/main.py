@@ -126,7 +126,7 @@ def submit(pid, filepath):
 
         try:
             if res.status_code != 200:
-                logger.error("submit faield. [filepath={}] [status_code={}]".format(
+                logger.error("submit failed. [filepath={}] [status_code={}]".format(
                     filepath, res.status_code))
             else:
                 logger.info("submit success. [filepath={}]".format(filepath))
