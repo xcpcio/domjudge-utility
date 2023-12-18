@@ -28,6 +28,4 @@ python gao.py <GYM ID> [--output <Output path>]
 
 # Incremental Seeding After Failure
 python gao.py <GYM ID> --submissions <submissions list that can be found under output path> [--output <Output path>]
-
-
 ```

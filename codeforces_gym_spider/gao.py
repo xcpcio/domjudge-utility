@@ -7,7 +7,7 @@ colorama.init(autoreset=True)
 
 extensions = (
             ('++', 'cpp'),
-            ('GNU C', 'c'), 
+            ('GNU C', 'c'),
             ('JavaScript', 'js'),
             ('Java', 'java'),
             ('Py', 'py'),
@@ -48,7 +48,7 @@ def issue_request(method, params, cred):
     #print(sig_plain)
     alg = hashlib.new("sha512", sig_plain.encode(encoding='ascii'))
     api_sig = alg.hexdigest()
-    uri = 'https://codeforces.com/api/%s?%s&apiKey=%s&time=%d&apiSig=%s%s'%(method, params, key, now, rand, api_sig) 
+    uri = 'https://codeforces.com/api/%s?%s&apiKey=%s&time=%d&apiSig=%s%s'%(method, params, key, now, rand, api_sig)
     #print(uri)
     r = requests.get(uri)
     return r
@@ -163,10 +163,11 @@ def download_submission(session, sub):
     problem = sub['problem']["index"]
     problem_root = output_root + problem + '/'
     if os.path.exists(problem_root) == False:
-        info('Problem %s Home not exsited, create it: '%(problem) + os.path.abspath(problem_root))
+        info('Problem %s Home not existed, create it: '%(problem) + os.path.abspath(problem_root))
         os.mkdir(problem_root)
     ext = get_extension(sub)
     author = sub['author']['teamName'] if 'teamName' in sub['author'] else sub['author']['members'][0]['handle']
+    author = author.replace(':', '_')
     sub_path = problem_root + sub['verdict'] + '_' + author + '_' + str(sub['id']) + '.' + ext
     if os.path.exists(sub_path):
         info('Skipped ' + sub_path)
@@ -226,7 +227,7 @@ def main():
             info('[%d/%d] Processed. %d Succeeded.'%(count, len(submissions), succeed))
             if count % 10 == 0:
                 info('Time Escaped %ds. ET: %ds.'%(passed, et))
-    
+
     print('Done. Succeed: %d, Total: %d'%(succeed, len(submissions)))
     return True
 
