@@ -90,7 +90,7 @@ def fetch_html(fetch_item: config.FetchItem):
         os.makedirs(saved_dir)
 
     html = resp.text
-    # html = replace_html(html, fetch_item)
+    html = replace_html(html, fetch_item)
     html = replace_assets_url(html)
     html = minify_html(html)
 
