@@ -7,15 +7,19 @@ import glob
 import shutil
 import time
 
-import grequests
+import asyncio
+import aiohttp
 import requests
 
 from . import utils
 from .dump_config import DumpConfig
+from typing import Optional
 
 
 class Dump:
-    def __init__(self, config: DumpConfig = None):
+    kTimeout = 10
+
+    def __init__(self, config: Optional[DumpConfig] = None):
         if config is None:
             config = DumpConfig({})
 
@@ -124,6 +128,14 @@ class Dump:
             self.logger.info('GET {}'.format(file_path))
             with open(file_path, 'r') as f:
                 return f.read()
+
+    async def async_send_request(self, url, params={}):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=self.headers, timeout=self.kTimeout) as resp:
+                if resp.status != 200:
+                    raise Exception(
+                        f"Failed to fetch {url}, status: {resp.status}")
+                return resp
 
     def image_download(self, img_url: str, dist: str):
         self.logger.info(
@@ -264,40 +276,42 @@ class Dump:
                                    self.sub_dir_path, self.api_path_name, saved_filename))
 
     def download_source_code(self, submission_id_list):
-        err_list = []
+        # err_list = []
 
-        def exception_handler(request, exception):
-            self.logger.error('An error occurred during request GET {}, exception:{}'.format(
-                request.url, exception))
+        # def exception_handler(request, exception):
+        #     self.logger.error('An error occurred during request GET {}, exception:{}'.format(
+        #         request.url, exception))
 
-            err_list.append(request)
+        #     err_list.append(request)
 
-        reqs = []
+        # reqs = []
 
-        for submission_id in submission_id_list:
-            url_prefix = utils.url_join(self.api_url, str(self.config.cid),
-                                        'submissions', str(submission_id))
-            reqs.append(grequests.get(url=utils.url_join(
-                url_prefix, 'files'), headers=self.headers))
-            reqs.append(grequests.get(url=utils.url_join(
-                url_prefix, 'source-code'), headers=self.headers))
+        # for submission_id in submission_id_list:
+        #     url_prefix = utils.url_join(self.api_url, str(self.config.cid),
+        #                                 'submissions', str(submission_id))
+        #     reqs.append(grequests.get(url=utils.url_join(
+        #         url_prefix, 'files'), headers=self.headers))
+        #     reqs.append(grequests.get(url=utils.url_join(
+        #         url_prefix, 'source-code'), headers=self.headers))
 
-        res_list = grequests.map(reqs, exception_handler=exception_handler)
+        # res_list = grequests.map(reqs, exception_handler=exception_handler)
 
-        if len(err_list) > 0:
-            return False
+        # if len(err_list) > 0:
+        #     return False
 
-        for i in range(0, len(res_list), 2):
-            submission_id = submission_id_list[i // 2]
+        # for i in range(0, len(res_list), 2):
+        #     submission_id = submission_id_list[i // 2]
 
-            res_files = res_list[i]
-            res_source_code = res_list[i + 1]
+        #     res_files = res_list[i]
+        #     res_source_code = res_list[i + 1]
 
-            with open(os.path.join(self.submissions_dir, str(submission_id), 'files.zip'), 'wb') as f:
-                f.write(res_files.content)
+        #     with open(os.path.join(self.submissions_dir, str(submission_id), 'files.zip'), 'wb') as f:
+        #         f.write(res_files.content)
 
-            with open(os.path.join(self.submissions_dir, str(submission_id), 'source-code.json'), 'w') as f:
-                f.write(res_source_code.content.decode('unicode-escape'))
+        #     with open(os.path.join(self.submissions_dir, str(submission_id), 'source-code.json'), 'w') as f:
+        #         f.write(res_source_code.content.decode('unicode-escape'))
+
+        self.logger.fatal("Not implemented")
 
         return True
 
