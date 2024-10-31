@@ -11,7 +11,7 @@ def ensure_dir(_path: str):
         os.makedirs(_path)
 
 
-def url_join(url, *args):
+def url_join(url: str, *args):
     url = url.rstrip('/')
 
     for arg in args:
