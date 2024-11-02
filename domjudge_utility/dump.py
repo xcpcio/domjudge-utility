@@ -1,19 +1,18 @@
-import os
-import logging
 import base64
-import json
-import math
 import glob
+import json
+import logging
+import math
+import os
 import shutil
 import time
+from typing import Optional
 
-import asyncio
 import aiohttp
 import requests
 
 from . import utils
 from .dump_config import DumpConfig
-from typing import Optional
 
 
 class Dump:
@@ -174,11 +173,13 @@ class Dump:
         for submission in self.submissions:
             id = submission['id']
 
-            language_id = submission['language_id']
-            for l in self.languages:
-                if language_id == l["id"]:
-                    submission['language_name'] = l['name']
-                    break
+            submission['language_name'] = None
+            if 'language_id' in submission.keys():
+                language_id = submission['language_id']
+                for l in self.languages:  # noqa: E741
+                    if language_id == l["id"]:
+                        submission['language_name'] = l['name']
+                        break
 
             # Pending
             if id not in submissions_judgement_map.keys():
@@ -187,7 +188,9 @@ class Dump:
             else:
                 judgement = submissions_judgement_map[id]
                 submission['verdict'] = judgement["judgement_type_id"]
-                submission['max_run_time'] = judgement['max_run_time']
+                submission['max_run_time'] = None
+                if "max_run_time" in judgement.keys():
+                    submission['max_run_time'] = judgement['max_run_time']
 
     def get_seconds(self, t):
         h, m, s = t.strip().split(":")
@@ -480,7 +483,7 @@ class Dump:
 
         submission_index = 1
         for submission in submissions:
-            id = submission['id']
+            id = submission['id']  # noqa: F841
             verdict = submission['verdict']
 
             if verdict != 'AC' and verdict != 'CE':
@@ -595,7 +598,7 @@ class Dump:
 
                 if num_judged == 0:
                     res.append('-')
-                elif p['solved'] == True:
+                elif p['solved'] is True:
                     res.append('+{}({})'.format(p['num_judged'], p['time']))
                 else:
                     res.append('-{}'.format(p['num_judged']))
